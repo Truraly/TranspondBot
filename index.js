@@ -16,6 +16,7 @@ const WechatServerUrl = process.env.WechatServerUrl;
 const { Log4js } = require("./log4");
 const Logger = Log4js.getLogger("default");
 ////////////////////////////////
+const { singleQuery } = require("./aliy");
 const { QQInterface } = require("./QQInterface");
 const QQBot = new QQInterface(QQServerUrl);
 
@@ -26,13 +27,13 @@ QQBot.connect((message) => {
   Logger.debug(`收到QQ消息: ${JSON.stringify(message)}`);
   callFuncs(message.tags, message.data);
 }).then(() => {
-  //   QQBot.sendPrivateMsg(adminInfo.QQID, "QQ机器人已上线");
+     QQBot.sendPrivateMsg(adminInfo.QQID, "QQ机器人已上线");
 });
 WechatBot.startMessageServer((message) => {
   Logger.debug(`收到微信消息:${JSON.stringify(message)}`);
   callFuncs(message.tags, message.data);
 });
-// WechatBot.sendPrivateMsg(adminInfo.WechatName, "微信机器人(server)已上线");
+WechatBot.sendPrivateMsg(adminInfo.WechatName, "微信机器人(server)已上线");
 
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -107,6 +108,20 @@ let EventList = [
           message.group_id == QQGroupID &&
           message.user_id != message.self_id
         ) {
+          // 如果是@机器人的消息，调用api
+          if (/^\[CQ:at,qq=1834732913\] ?/.exec(message.raw_message)) {
+            Logger.info("收到@消息", message.raw_message);
+            singleQuery(
+              message.raw_message.replace(/^\[CQ:at,qq=1834732913\] ?/, "")
+            ).then((res) => {
+              QQBot.sendGroupMsg(
+                QQGroupID,
+                "[CQ:at,qq=" + message.user_id + "] " + res
+              );
+            });
+            return;
+          }
+
           message.raw_message = message.raw_message
             .replace(/\[CQ\:image,[^\]]+\]/, "[QQ图片]")
             .replace(/\[CQ\:video,[^\]]+\]/, "[QQ视频]");
@@ -214,3 +229,13 @@ let EventList = [
     ],
   ],
 ];
+
+// 全局错误处理
+process.on("uncaughtException", (err) => {
+  Logger.error("uncaughtException", err);
+  try {
+    QQBot.sendPrivateMsg(adminInfo.QQID, "uncaughtException: " + err);
+  } catch (e) {
+    Logger.error("发送消息失败", e);
+  }
+});

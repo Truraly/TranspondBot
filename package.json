@@ -6,6 +6,17 @@
     "express": "^4.21.1",
     "log4js": "^6.9.1",
     "multer": "^1.4.5-lts.1",
+    "openai": "^4.67.3",
     "ws": "^8.18.0"
-  }
+  },
+  "name": "transpondbot",
+  "version": "1.0.0",
+  "description": "## 转发消息",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Truraly",
+  "license": "MIT"
 }
