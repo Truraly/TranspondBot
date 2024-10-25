@@ -1,11 +1,17 @@
 require("dotenv").config();
 async function singleQuery(query) {
   const OpenAI = require("openai");
-  const openai = new OpenAI({
+
+  const GPT_bailian = {
     // 若没有配置环境变量，请用百炼API Key将下行替换为：apiKey: "sk-xxx",
     apiKey: process.env.DASHSCOPE_API_KEY,
     baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-  });
+  };
+//   const GPT_openai = {
+//     apiKey: "sk-XvbyH5YYdUa09LEsB8791d145aC0436aBbDd0231B5D020A5",
+//     baseURL: "https://burn.hair",
+//   };
+  const openai = new OpenAI(GPT_bailian);
 
   const completion = await openai.chat.completions.create({
     model: "qwen-plus", //模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
@@ -18,27 +24,7 @@ async function singleQuery(query) {
       { role: "user", content: query },
     ],
   });
-  //   console.log(JSON.stringify(completion));
-  //   res = {
-  //     choices: [
-  //       {
-  //         message: {
-  //           role: "assistant",
-  //           content:
-  //             "不，我是一个有用的助手。但我可以帮你扮演或想象成一只猫娘。你想玩个角色扮演游戏吗，还是需要关于“猫娘”主题的帮助和信息？例如，动漫中的猫娘角色、猫娘的绘画教程等。",
-  //         },
-  //         finish_reason: "stop",
-  //         index: 0,
-  //         logprobs: null,
-  //       },
-  //     ],
-  //     object: "chat.completion",
-  //     usage: { prompt_tokens: 24, completion_tokens: 52, total_tokens: 76 },
-  //     created: 1728596052,
-  //     system_fingerprint: null,
-  //     model: "qwen-plus",
-  //     id: "chatcmpl-0ebaceb3-cfee-9b10-adb2-2a8730a3ebd2",
-  //   };
+  console.log(completion);
   const cost =
     completion.usage.prompt_tokens * 0.0002 +
     completion.usage.completion_tokens * 0.0006;
@@ -52,7 +38,6 @@ module.exports = {
   singleQuery,
 };
 
-//singleQuery("你好").then((res) => {
-	
-  //console.log(res);
-//});
+singleQuery("你好").then((res) => {
+  console.log(res);
+});
