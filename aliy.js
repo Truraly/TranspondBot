@@ -38,6 +38,6 @@ module.exports = {
   singleQuery,
 };
 
-singleQuery("你好").then((res) => {
-  console.log(res);
-});
+// singleQuery("你好").then((res) => {
+//   console.log(res);
+// });

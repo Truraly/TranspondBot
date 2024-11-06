@@ -48,8 +48,16 @@ setTimeout(() => {
  */
 function callFuncs(taglist, message) {
   EventList.forEach((event) => {
-    if (event[0].every((tag) => taglist.includes(tag))) {
-      event[1].forEach((func) => func(message));
+    // 如果目标对象
+    if (event.tags.every((tag) => taglist.includes(tag))) {
+      event.funs.every((func) => {
+        return (
+          func(message, {
+            QQBot,
+            WechatBot,
+          }) !== false
+        );
+      });
     }
   });
 }
@@ -58,11 +66,11 @@ function callFuncs(taglist, message) {
 let EventList = [
   // [["tag1","tag2"],[callback1,callback2]],
 
-  [
+  {
     // 来自napcat实现的消息
-    ["qq", "msg"],
-    [
-      (message) => {
+    tags: ["qq", "msg"],
+    funs: [
+      (message, bots) => {
         switch (message.post_type) {
           case "meta_event":
             {
@@ -96,16 +104,18 @@ let EventList = [
               }
             }
             break;
+          default:
+            Logger.info("QQ未知的消息类型", message);
         }
       },
     ],
-  ],
-
-  [
+  },
+  {
     /// 来自QQ的群聊消息
-    ["qq", "message", "group"],
-    [
-      (message) => {
+    tags: ["qq", "message", "group"],
+    funs: [
+      // 机器人回复
+      (message, bots) => {
         // 如果是@机器人的消息，调用api
         let reg_at = new RegExp(`^\\[CQ:at,qq=${message.self_id}\\] ?`);
         if (reg_at.exec(message.raw_message)) {
@@ -113,13 +123,16 @@ let EventList = [
           singleQuery(
             message.raw_message.replace(reg_at, "").replace(/\s+/g, "")
           ).then((res) => {
-            QQBot.sendGroupMsg(
+            bots.QQBot.sendGroupMsg(
               message.group_id,
               "[CQ:at,qq=" + message.user_id + "] " + res
             );
           });
-          return;
+          return false;
         }
+      },
+      // 转发消息
+      (message, bots) => {
         if (
           message.group_id == QQGroupID &&
           message.user_id != message.self_id
@@ -135,11 +148,11 @@ let EventList = [
         }
       },
     ],
-  ],
-  [
+  },
+  {
     // 来自WechatWebHook的消息
-    ["wechat", "msg"],
-    [
+    tags: ["wechat", "msg"],
+    funs: [
       (payload) => {
         // payload.source.room 为 {}  and payload.source.to 不为{} 时为私聊消息 ，payload.source.to 为 {} and payload.source.room 不为{} 时为群聊消息,其他情况为other
         if (
@@ -159,20 +172,20 @@ let EventList = [
         }
       },
     ],
-  ],
-  [
+  },
+  {
     // 来自微信的私聊消息
-    ["wechat", "message", "private"],
-    [
+    tags: ["wechat", "message", "private"],
+    funs: [
       (payload) => {
         Logger.info("收到微信私聊消息:", payload);
       },
     ],
-  ],
-  [
+  },
+  {
     // 来自微信的群聊消息
-    ["wechat", "message", "group"],
-    [
+    tags: ["wechat", "message", "group"],
+    funs: [
       (payload) => {
         const sender_name = payload.source.from.payload.name;
         const room_topic = payload.source.room.payload.topic;
@@ -216,20 +229,20 @@ let EventList = [
         }
       },
     ],
-  ],
-  [
+  },
+  {
     // 来自微信的其他消息
-    ["wechat", "other"],
-    [
+    tags: ["wechat", "other"],
+    funs: [
       (payload) => {
         Logger.info("收到 WeChat 其他消息:", payload);
       },
     ],
-  ],
-  [
+  },
+  {
     // 来自微信的登录消息
-    ["wechat", "meta", "login"],
-    [
+    tags: ["wechat", "meta", "login"],
+    funs: [
       (payload) => {
         Logger.info("微信机器人已上线");
         WechatBot.sendPrivateMsg(
@@ -238,7 +251,7 @@ let EventList = [
         );
       },
     ],
-  ],
+  },
 ];
 
 // 全局错误处理
