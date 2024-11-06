@@ -77,7 +77,8 @@ class WechatInterface {
   async sendPrivateMsg(user_id, message) {
     return new Promise(async (resolve, reject) => {
       let data = {
-        to: user_id,
+        // to: user_id,
+        to: { alias: user_id },
         isRoom: false,
         data: {
           content: message,
@@ -120,7 +121,7 @@ class WechatInterface {
         })
         .catch((error) => {
           Logger.error(`发送消息失败: ${error}`);
-          reject();
+          resolve();
         });
     });
   }

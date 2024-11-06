@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "WechatQQBot ", // 中间转发服务
+      name: "Tsbot", // 中间转发服务
       script: "./index.js",
       env: {
         WechatBotName: "田园十三号机",
@@ -39,7 +39,7 @@ module.exports = {
       },
     },
     {
-      name: "WechatServer", // 微信连接服务器
+      name: "WechatWebhook", // 微信连接服务器
       script: "npx",
       args: "--no-install wechatbot-webhook",
       env: {

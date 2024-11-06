@@ -27,14 +27,14 @@ QQBot.connect((message) => {
   Logger.debug(`收到QQ消息: ${JSON.stringify(message)}`);
   callFuncs(message.tags, message.data);
 }).then(() => {
-  QQBot.sendPrivateMsg(adminInfo.QQID, "QQ机器人已上线");
+  QQBot.sendPrivateMsg(adminInfo.QQID, "QQ机器人(napcat)已上线");
 });
 WechatBot.startMessageServer((message) => {
   Logger.debug(`收到微信消息:${JSON.stringify(message)}`);
   callFuncs(message.tags, message.data);
 });
-setInterval(() => {
-  WechatBot.sendPrivateMsg(adminInfo.WechatName, "微信机器人(server)已上线");
+setTimeout(() => {
+  WechatBot.sendPrivateMsg(adminInfo.WechatName, "微信机器人(Tsbot)已上线");
 }, 5000);
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ let EventList = [
   // [["tag1","tag2"],[callback1,callback2]],
 
   [
-    // 来自QQbot实现的消息
+    // 来自napcat实现的消息
     ["qq", "msg"],
     [
       (message) => {
@@ -102,7 +102,7 @@ let EventList = [
   ],
 
   [
-    /// 来自QQbot的群聊消息
+    /// 来自QQ的群聊消息
     ["qq", "message", "group"],
     [
       (message) => {
@@ -137,7 +137,7 @@ let EventList = [
     ],
   ],
   [
-    // 来自微信bot实现的消息
+    // 来自WechatWebHook的消息
     ["wechat", "msg"],
     [
       (payload) => {
@@ -161,7 +161,7 @@ let EventList = [
     ],
   ],
   [
-    // 来自微信bot的私聊消息
+    // 来自微信的私聊消息
     ["wechat", "message", "private"],
     [
       (payload) => {
@@ -170,7 +170,7 @@ let EventList = [
     ],
   ],
   [
-    // 来自微信bot的群聊消息
+    // 来自微信的群聊消息
     ["wechat", "message", "group"],
     [
       (payload) => {
@@ -218,7 +218,7 @@ let EventList = [
     ],
   ],
   [
-    // 来自微信bot的其他消息
+    // 来自微信的其他消息
     ["wechat", "other"],
     [
       (payload) => {
@@ -227,14 +227,14 @@ let EventList = [
     ],
   ],
   [
-    // 来自微信bot的登录消息
+    // 来自微信的登录消息
     ["wechat", "meta", "login"],
     [
       (payload) => {
         Logger.info("微信机器人已上线");
         WechatBot.sendPrivateMsg(
           adminInfo.WechatName,
-          "微信机器人(webhook)已上线"
+          "微信机器人(WechatWebhook)已上线"
         );
       },
     ],
