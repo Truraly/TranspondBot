@@ -33,7 +33,9 @@ WechatBot.startMessageServer((message) => {
   Logger.debug(`收到微信消息:${JSON.stringify(message)}`);
   callFuncs(message.tags, message.data);
 });
-WechatBot.sendPrivateMsg(adminInfo.WechatName, "微信机器人(server)已上线");
+setInterval(() => {
+  WechatBot.sendPrivateMsg(adminInfo.WechatName, "微信机器人(server)已上线");
+}, 5000);
 
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -57,7 +59,7 @@ let EventList = [
   // [["tag1","tag2"],[callback1,callback2]],
 
   [
-    // 来自QQbot的消息
+    // 来自QQbot实现的消息
     ["qq", "msg"],
     [
       (message) => {
@@ -112,7 +114,7 @@ let EventList = [
             message.raw_message.replace(reg_at, "").replace(/\s+/g, "")
           ).then((res) => {
             QQBot.sendGroupMsg(
-              QQGroupID,
+              message.group_id,
               "[CQ:at,qq=" + message.user_id + "] " + res
             );
           });
@@ -135,7 +137,7 @@ let EventList = [
     ],
   ],
   [
-    // 来自微信bot的消息
+    // 来自微信bot实现的消息
     ["wechat", "msg"],
     [
       (payload) => {
